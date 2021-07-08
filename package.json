@@ -63,8 +63,7 @@
   },
   "lint-staged": {
     "*.{js,ts}": [
-      "eslint \"**/*.{ts,tsx}\" --fix --color",
-      "git add"
+      "eslint \"**/*.{ts,tsx}\" --fix --color"
     ]
   }
 }
