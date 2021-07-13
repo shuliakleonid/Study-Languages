@@ -6,11 +6,17 @@ import { ManageComponent } from './components/mock-component/manage/manage.compo
 import { CheckComponent } from './components/mock-component/check/check.component';
 import { StatisticsComponent } from './components/mock-component/statistics/statistics.component';
 import { EditorComponent } from './components/mock-component/editor/editor.component';
+import { Route } from '../constants/route-constant';
 
 const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./models/login/login.module').then((m) => m.LoginModule),
+  },
+  {
+    path: 'user',
+    loadChildren: () =>
+      import('./models/user-profile/user-profile.module').then((m) => m.UserProfileModule),
   },
   {
     path: 'speaking',
@@ -40,31 +46,31 @@ const routes: Routes = [
   {
     path: 'listening',
     loadChildren: () =>
-      import('./models/listening/listening.module').then((m) => m.ListeningModule),
+      import('./models/listening-test/listening-test.module').then((m) => m.ListeningTestModule),
   },
   // mock component for check business logic
   {
-    path: 'home',
+    path: Route.home,
     component: HomeComponent,
   },
   {
-    path: 'users',
+    path: Route.users,
     component: UsersComponent,
   },
   {
-    path: 'manage',
+    path: Route.manage,
     component: ManageComponent,
   },
   {
-    path: 'check',
+    path: Route.check,
     component: CheckComponent,
   },
   {
-    path: 'statistics',
+    path: Route.statistics,
     component: StatisticsComponent,
   },
   {
-    path: 'editor',
+    path: Route.editor,
     component: EditorComponent,
   },
 ];
