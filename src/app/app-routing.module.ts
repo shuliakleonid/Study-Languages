@@ -7,14 +7,15 @@ import { CheckComponent } from './components/mock-component/check/check.componen
 import { StatisticsComponent } from './components/mock-component/statistics/statistics.component';
 import { EditorComponent } from './components/mock-component/editor/editor.component';
 import { Route } from '../constants/route-constant';
+import { GrammarTestComponent } from './models/grammar-test/grammar-test.component';
 
 const routes: Routes = [
   {
-    path: 'login',
+    path: '',
     loadChildren: () => import('./models/login/login.module').then((m) => m.LoginModule),
   },
   {
-    path: 'user',
+    path: 'home',
     loadChildren: () =>
       import('./models/user-profile/user-profile.module').then((m) => m.UserProfileModule),
   },
@@ -34,9 +35,9 @@ const routes: Routes = [
       import('./models/hr-profile/hr-profile.module').then((m) => m.HrProfileModule),
   },
   {
-    path: 'coachProfile',
+    path: 'coach-profile',
     loadChildren: () =>
-      import('./models/coachProfile/coachProfile.module').then((m) => m.CoachProfileModule),
+      import('./models/coach-profile/coach-profile.module').then((m) => m.CoachProfileModule),
   },
   {
     path: 'writing',
@@ -44,11 +45,19 @@ const routes: Routes = [
       import('./models/writing-test/writing-test.module').then((m) => m.WritingTestModule),
   },
   {
+    path: 'adminProfile',
+    loadChildren: () =>
+      import('./models/admin-profile/admin-profile.module').then((m) => m.AdminProfileModule),
+  },
+  {
     path: 'listening',
     loadChildren: () =>
       import('./models/listening-test/listening-test.module').then((m) => m.ListeningTestModule),
   },
-  // mock component for check business logic
+  {
+    path: 'result',
+    loadChildren: () => import('./models/result/result.module').then((m) => m.ResultModule),
+  },
   {
     path: Route.home,
     component: HomeComponent,
@@ -72,6 +81,10 @@ const routes: Routes = [
   {
     path: Route.editor,
     component: EditorComponent,
+  },
+  {
+    path: Route.grammarTest,
+    component: GrammarTestComponent,
   },
 ];
 

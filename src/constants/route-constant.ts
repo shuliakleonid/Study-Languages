@@ -1,17 +1,15 @@
 export enum Route {
-  users = 'users',
+  users = 'hrProfile',
   home = 'home',
-  check = 'check',
+  check = 'coach-profile',
   editor = 'editor',
-  manage = 'manage',
+  manage = 'adminProfile',
   statistics = 'statistics',
-}
-
-export enum Role {
-  user = 'user',
-  hr = 'hr',
-  couch = 'couch',
-  admin = 'admin',
+  grammarTest = 'grammar',
+  listening = 'listening',
+  writing = 'writing',
+  speaking = 'speaking',
+  result = 'result',
 }
 
 export enum SidebarMenu {
@@ -23,9 +21,4 @@ export enum SidebarMenu {
   statistics = 'Statistics',
 }
 
-export enum UserViewValue {
-  user = 'User',
-  hr = 'HR',
-  couch = 'Couch',
-  admin = 'Admin',
-}
+export const LoginApiUrl = 'http://elevel-001-site1.btempurl.com/api/User/token';
