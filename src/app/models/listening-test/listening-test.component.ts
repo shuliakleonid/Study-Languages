@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { MOCK_QUESTION_LIST_AUDITION, Question } from '../../../constants/mock-grammar-test';
 
 @Component({
   selector: 'app-listening',
@@ -6,7 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./listening-test.component.scss'],
 })
 export class ListeningTestComponent implements OnInit {
-  // constructor() { }
+  questions: Question[] = [];
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.questions = [...MOCK_QUESTION_LIST_AUDITION];
+  }
 }

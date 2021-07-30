@@ -1,7 +1,7 @@
 import { MatCardModule } from '@angular/material/card';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -10,9 +10,16 @@ import { MatTableModule } from '@angular/material/table';
 import { MatInputModule } from '@angular/material/input';
 import { MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTabsModule } from '@angular/material/tabs';
+import { MatTabsModule, MAT_TABS_CONFIG } from '@angular/material/tabs';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/radio';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatListModule } from '@angular/material/list';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -23,13 +30,16 @@ import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/rad
     MatInputModule,
     MatSortModule,
     MatButtonModule,
-    MatTabsModule,
     MatStepperModule,
     MatRadioModule,
     FormsModule,
     MatIconModule,
     MatCardModule,
     MatDialogModule,
+    MatTabsModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatProgressBarModule,
   ],
   declarations: [],
   exports: [
@@ -47,11 +57,25 @@ import { MAT_RADIO_DEFAULT_OPTIONS, MatRadioModule } from '@angular/material/rad
     FormsModule,
     MatIconModule,
     MatDialogModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatProgressBarModule,
+    MatSidenavModule,
+    MatListModule,
+    MatToolbarModule,
+    MatCardModule,
+    MatOptionModule,
+    MatSelectModule,
+    MatSnackBarModule,
   ],
   providers: [
     {
       provide: MAT_RADIO_DEFAULT_OPTIONS,
       useValue: { color: 'accent' },
+    },
+    {
+      provide: MAT_TABS_CONFIG,
+      useValue: { dynamicHeight: true },
     },
   ],
 })
