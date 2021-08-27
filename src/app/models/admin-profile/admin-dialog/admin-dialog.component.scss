@@ -1,41 +1,24 @@
 .container {
   display: flex;
   flex-direction: column;
-  width: 37em;
-  height: 27em;
+  box-sizing: border-box;
+  width: 22em;
+  height: 20em;
 }
 
-h4 {
-  text-align: center;
-}
-
-.modal-dialog-screen {
+mat-card-header {
   display: flex;
-  flex-direction: row;
-  justify-content: space-evenly;
+  flex-direction: column;
+  align-items: center;
+
+  height: 150px;
 }
 
-.img {
-  width: 10em;
-  height: 10em;
-  margin: 20px;
-  background-color: gray;
-  border-radius: 5em;
-}
-
-.coach_info {
-  align-self: center;
-}
-
-p {
-  padding-bottom: 20px;
-}
-
-button {
-  margin: 30px;
-  font-size: 21px;
-}
-
-.btn {
-  padding-left: 130px;
+.dialog-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20em;
+  height: 15em;
+  box-shadow: none !important;
 }

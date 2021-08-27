@@ -1,7 +1,11 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { STEPPER_GLOBAL_OPTIONS } from '@angular/cdk/stepper';
-import { Question } from '../../interfaces/question-answer';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { combineLatest } from 'rxjs';
+import { startWith } from 'rxjs/operators';
+import { MatDialog } from '@angular/material/dialog';
+import { AnswerQuestion, Question } from '../../interfaces/question-answer';
+import { ReportMistakeDialogComponent } from '../report-mistake-dialog/report-mistake-dialog.component';
 
 @Component({
   selector: 'app-stepper',
@@ -10,24 +14,57 @@ import { Question } from '../../interfaces/question-answer';
   providers: [
     {
       provide: STEPPER_GLOBAL_OPTIONS,
-      useValue: { showError: true },
+      useValue: { showError: true, displayDefaultIndicatorType: false },
     },
   ],
 })
-export class StepperComponent implements OnInit, OnChanges {
-  @Input() questionList!: Question[];
+export class StepperComponent implements OnChanges, OnInit {
+  @Input() questionList: Question[] | null = null;
 
-  stepperFormGroups: FormGroup[] = [];
+  @Input() testId: string | null = null;
 
-  constructor(private formBuilder: FormBuilder) {}
+  @Output() answersChosenId = new EventEmitter<string[] | null>();
 
-  ngOnInit() {}
+  selectedAnswersId: string[] | null = null;
 
-  ngOnChanges() {
-    this.stepperFormGroups = this.questionList.map(() =>
+  stepperFormGroups: FormGroup[] | undefined = [];
+
+  constructor(private formBuilder: FormBuilder, public dialog: MatDialog) {}
+
+  ngOnInit(): void {}
+
+  ngOnChanges(): void {
+    this.stepperFormGroups = this.questionList?.map(() =>
       this.formBuilder.group({
         stepCtrl: ['', Validators.required],
       }),
     );
+    this.onChanges();
+  }
+
+  onChanges(): void {
+    const observables = this.stepperFormGroups?.map((form) =>
+      form.controls.stepCtrl.valueChanges.pipe(
+        startWith(''), // set initial value to let the subscribe to be called
+      ),
+    );
+
+    if (!observables) return;
+
+    const combined = combineLatest(observables);
+
+    combined.subscribe((answers: AnswerQuestion[]) => {
+      this.selectedAnswersId = answers.map((answer) => answer.id).filter((answ) => answ);
+    });
+  }
+
+  onAnswersSubmit(): void {
+    this.answersChosenId.emit(this.selectedAnswersId);
+  }
+
+  openReportDialog(questionId: string, auditionId: string) {
+    this.dialog.open(ReportMistakeDialogComponent, {
+      data: { questionId, auditionId, testId: this.testId },
+    });
   }
 }

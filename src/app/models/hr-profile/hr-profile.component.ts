@@ -1,53 +1,146 @@
-import { AfterViewInit, Component, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatPaginator, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatSort } from '@angular/material/sort';
+import { FormControl } from '@angular/forms';
+import { Observable } from 'rxjs';
+import { UsersList, UserTable } from 'src/app/interfaces/test';
+import { ApiAssignTest, GetHrUser, User } from 'src/app/interfaces/user.interfaces';
+import { TestStoreService } from 'src/app/services/store/test-store.service';
+import { map, tap } from 'rxjs/operators';
 import { UserResultsDialogComponent } from '../dialog-module/user-results-dialog/user-results-dialog.component';
-import { MOCK_USERS, UserData } from '../../../mocks/users-utils.mock';
-import { User } from '../../interfaces/user';
 import { HrProfileDialogComponent } from './hr-profile-dialog/hr-profile-dialog.component';
+import { isSubstring } from '../../helpers/filter-check';
+import { UserTableStoreService } from './services/user-table-store.service';
+import { FilterParams, SortType, UserTableService } from './services/user-table.service';
+
+const DEFAULT_SIZE = 10;
+const DEFAULT_PAGE = 1;
+
+function getNextSortType(sortType: SortType) {
+  if (sortType === null) {
+    return 'desc';
+  }
+  if (sortType === 'desc') {
+    return 'asc';
+  }
+  if (sortType === 'asc') {
+    return null;
+  }
+  return null;
+}
 
 @Component({
   selector: 'app-hr-profile',
   templateUrl: './hr-profile.component.html',
   styleUrls: ['./hr-profile.component.scss'],
 })
-export class HrProfileComponent implements AfterViewInit {
-  displayedColumns: string[] = ['id', 'firstName', 'lastName', 'assessment', 'info'];
+export class HrProfileComponent implements OnInit {
+  displayedColumns: string[] = ['firstName', 'lastName', 'assessment', 'info'];
 
-  dataSource: MatTableDataSource<UserData>;
+  filterFirstNameValue: string | null = null;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator | null = null;
+  filterLastNameValue: string | null = null;
 
-  @ViewChild(MatSort) sort: MatSort | null = null;
+  sortOn: 'firstName' | 'lastName' = 'firstName';
 
-  constructor(public dialog: MatDialog) {
-    this.dataSource = new MatTableDataSource(MOCK_USERS);
+  currentFirstNameSortType: SortType = null;
+
+  currentLastNameSortType: SortType = null;
+
+  dataSource: UsersList = {
+    pageSize: DEFAULT_SIZE,
+    currentPage: DEFAULT_PAGE,
+    results: [],
+    rowCount: 0,
+  };
+
+  pageEvent: PageEvent | undefined;
+
+  constructor(
+    public dialog: MatDialog,
+    private userTableService: UserTableService,
+    private testStoreService: TestStoreService,
+  ) {}
+
+  ngOnInit(): void {
+    this.initDataSource();
   }
 
-  ngAfterViewInit() {
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.sort;
-  }
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
-
-  onOpenInfoDialog(row: User): void {
+  onOpenInfoDialog(row: GetHrUser): void {
+    this.testStoreService.getAllUserResults(row.userId);
     this.dialog.open(UserResultsDialogComponent, {
-      width: '35rem',
-      data: { id: row.id, firstName: row.firstName, lastName: row.lastName },
+      width: '45rem',
+      data: { ...row },
     });
   }
 
-  onClick(id: number) {
-    this.dialog.open(HrProfileDialogComponent, { data: { id } });
+  onClick(userId: string) {
+    this.dialog.open(HrProfileDialogComponent, {
+      data: { userId } as ApiAssignTest,
+    });
+  }
+
+  initDataSource() {
+    this.getUsers({});
+  }
+
+  onPaginateChange({ pageIndex, pageSize }: PageEvent) {
+    this.getUsers({
+      page: pageIndex + 1,
+      size: pageSize,
+    });
+  }
+
+  findFirstName(firstName: string | null) {
+    this.getUsers({
+      page: DEFAULT_PAGE,
+      size: DEFAULT_SIZE,
+      firstName,
+    });
+  }
+
+  findLastName(lastName: string | null) {
+    this.getUsers({
+      page: DEFAULT_PAGE,
+      size: DEFAULT_SIZE,
+      lastName,
+    });
+  }
+
+  onChangeFirstName() {
+    this.sortOn = 'firstName';
+    this.currentLastNameSortType = null;
+    this.currentFirstNameSortType = getNextSortType(this.currentFirstNameSortType);
+
+    this.getUsers({});
+  }
+
+  onChangeLastName() {
+    this.sortOn = 'lastName';
+
+    this.currentFirstNameSortType = null;
+    this.currentLastNameSortType = getNextSortType(this.currentLastNameSortType);
+
+    this.getUsers({});
+  }
+
+  getUsers(filterParams: Partial<FilterParams>) {
+    const sortDirection =
+      this.sortOn === 'firstName' ? this.currentFirstNameSortType : this.currentLastNameSortType;
+
+    this.userTableService
+      .getUsersByFilter({
+        page: filterParams.page || this.dataSource.currentPage,
+        size: filterParams.size || this.dataSource.pageSize,
+        firstName: filterParams.firstName || this.filterFirstNameValue,
+        lastName: filterParams.lastName || this.filterLastNameValue,
+        sortDirection,
+        sortOn: filterParams.sortOn || this.sortOn,
+      })
+      .subscribe((res: UsersList) => {
+        this.dataSource = res;
+      });
   }
 }

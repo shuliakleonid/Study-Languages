@@ -1,5 +1,3 @@
-@import 'src/theme/variables.scss';
-
 table {
   width: 100%;
 }
@@ -9,21 +7,27 @@ table {
 }
 
 .mat-flat-button:hover {
-  background-color: $light-cyan;
+  background-color: var(--light-cyan);
 }
 
 .mat-raised-button:hover {
   background-color: gray;
 }
 
-.mat-form-field {
-  box-sizing: border-box;
-  width: 100%;
-  padding: 0 1rem;
-  font-size: 14px;
-}
-
 td,
 th {
   width: 10%;
+}
+
+.header {
+  padding: 5px;
+  vertical-align: bottom;
+}
+
+.mat-form-field {
+  margin: 1.5em 0;
+}
+
+.filter {
+  display: block;
 }

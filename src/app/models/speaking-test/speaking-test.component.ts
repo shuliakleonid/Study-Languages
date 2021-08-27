@@ -1,8 +1,21 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
+import { TopicModule } from '../../interfaces/essay-speaking';
 import { ErrorStoreService } from '../../services/store/error-store.service';
-import { Route } from '../../../constants/route-constant';
+import { Route } from '../../constants/route-constant';
+import { FinishModalDialogComponent } from '../dialog-module/finish-modal-dialog/finish-modal-dialog.component';
+import { ReportMistakeDialogComponent } from '../../components/report-mistake-dialog/report-mistake-dialog.component';
+import { CoachAudioDataStoreService } from '../../services/store/coach-audio-data-store.service';
 
 declare let MediaRecorder: any;
 
@@ -11,7 +24,13 @@ declare let MediaRecorder: any;
   templateUrl: './speaking-test.component.html',
   styleUrls: ['./speaking-test.component.scss'],
 })
-export class SpeakingTestComponent implements OnInit {
+export class SpeakingTestComponent implements OnInit, OnDestroy {
+  @Input() speaking: TopicModule | null = null;
+
+  @Input() testId: string | null = null;
+
+  @Output() speachRecorded = new EventEmitter<{ src: SafeUrl } | null>();
+
   mediaRecorder: any;
 
   chunks: Blob[] = [];
@@ -33,13 +52,28 @@ export class SpeakingTestComponent implements OnInit {
   numberAttempt = 0;
 
   constructor(
+    private audioData: CoachAudioDataStoreService,
     private cd: ChangeDetectorRef,
     private dom: DomSanitizer,
     private errorStoreService: ErrorStoreService,
     private readonly router: Router,
+    public dialog: MatDialog,
   ) {}
 
+  home(): void {
+    throw new Error('Method not implemented.');
+  }
+
+  openDialog() {
+    this.dialog.open(FinishModalDialogComponent);
+  }
+
   async ngOnInit() {
+    this.speaking = {
+      id: '',
+      topicName: '',
+    };
+
     let stream = null;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -52,6 +86,7 @@ export class SpeakingTestComponent implements OnInit {
           src: this.dom.bypassSecurityTrustUrl(audioURL),
         };
         this.audioFile = audio;
+        this.audioData.uploadListeningFile(blob);
         this.cd.detectChanges();
       };
       this.mediaRecorder.ondataavailable = (e: { data: Blob }) => {
@@ -136,5 +171,13 @@ export class SpeakingTestComponent implements OnInit {
 
   finishTest() {
     this.router.navigate([Route.result]);
+  }
+
+  onSpeakingSubmit(): void {
+    this.speachRecorded.emit(this.audioFile);
+  }
+
+  openReportDialog(speakingId?: string) {
+    this.dialog.open(ReportMistakeDialogComponent, { data: { speakingId, testId: this.testId } });
   }
 }

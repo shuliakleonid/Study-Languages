@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { AuthStoreService } from '../../services/store/auth-store.service';
-import { usersMockDataResponse } from '../../../constants/mock-user-data';
-import { UserResponseType } from '../../../interfaces/user.interfaces';
+import { usersMockDataResponse } from '../../constants/mock-user-data';
+import { UserResponseType } from '../../interfaces/user.interfaces';
 import { ErrorStoreService } from '../../services/store/error-store.service';
 import { ErrorModel, ErrorType } from '../../interfaces/error';
 
@@ -45,8 +45,8 @@ export class LoginComponent implements OnInit {
     }
     this.submitted = false;
     this.authStoreService.signIn({
-      email: this.loginReactiveForm.value.userLogin || this.selectedUser,
-      password: this.loginReactiveForm.value.userPassword || 'Pa$$w0rd.',
+      email: this.loginReactiveForm.value.userLogin,
+      password: this.loginReactiveForm.value.userPassword,
     });
   }
 
@@ -59,7 +59,7 @@ export class LoginComponent implements OnInit {
   private initForm() {
     this.loginReactiveForm = this.fb.group({
       userLogin: ['', [Validators.required, Validators.email]],
-      userPassword: ['Pa$$w0rd.', [Validators.required, Validators.minLength(6)]],
+      userPassword: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 }

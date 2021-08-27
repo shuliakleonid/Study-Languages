@@ -1,10 +1,12 @@
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { Component, Inject, OnInit } from '@angular/core';
-import { User } from '../../../interfaces/user';
-import { user } from '../../../../constants/mock-user-data';
-import { UserRole } from '../../../../constants/data-constants';
-import { Test } from '../../../interfaces/test';
-import { MOCK_TEST_RESULTS } from '../../../../constants/mock-test-results';
+import { Component, Inject, Input, OnInit } from '@angular/core';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
+import { TestStoreService } from 'src/app/services/store/test-store.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { user } from '../../../constants/mock-user-data';
+import { TestResult } from '../../../interfaces/test';
+import { GetHrUser } from '../../../interfaces/user.interfaces';
+import { CoachAudioDataStoreService } from '../../../services/store/coach-audio-data-store.service';
 
 @Component({
   selector: 'app-user-results-dialog',
@@ -12,31 +14,36 @@ import { MOCK_TEST_RESULTS } from '../../../../constants/mock-test-results';
   styleUrls: ['./user-results-dialog.component.scss'],
 })
 export class UserResultsDialogComponent implements OnInit {
-  user: User = {
-    id: 1,
-    firstName: 'Сальвадор',
-    lastName: 'Бананович',
-    email: 'salsa@mail.com',
-    role: UserRole.Coach,
-    userPhoto: '',
-  };
+  @Input() user!: GetHrUser;
+
+  results$: Observable<TestResult[] | undefined> = this.testStoreService.testResults$;
 
   isClicked = false;
 
-  results: Test[] = [];
+  results: TestResult[] = [];
+
+  imgFilePath: SafeUrl | undefined;
 
   get testsCount() {
     return this.results.length;
   }
 
   constructor(
+    private testStoreService: TestStoreService,
     public dialogRef: MatDialogRef<UserResultsDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: User,
+    @Inject(MAT_DIALOG_DATA) public data: GetHrUser,
+    private readonly audioData: CoachAudioDataStoreService,
+    private sanitizer: DomSanitizer,
   ) {}
 
-  ngOnInit() {
-    this.results = [...MOCK_TEST_RESULTS];
+  async ngOnInit() {
     this.user = { ...user, ...this.data };
+    const blob = await this.audioData.fetchUrlAudio(this.user.avatar);
+    const reader = new FileReader();
+    reader.readAsDataURL(<Blob>blob);
+    reader.onload = () => {
+      this.imgFilePath = this.sanitizer.bypassSecurityTrustUrl(reader.result as string);
+    };
   }
 
   onAssignBtnClick(): void {

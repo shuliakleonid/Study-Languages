@@ -1,16 +1,19 @@
-import { Component, OnInit } from '@angular/core';
-import { MOCK_QUESTION_LIST } from '../../../constants/mock-grammar-test';
-import { Question } from '../../interfaces/question-answer';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { AnswerQuestion, Question } from '../../interfaces/question-answer';
 
 @Component({
   selector: 'app-grammar-test',
   templateUrl: './grammar-test.component.html',
   styleUrls: ['./grammar-test.component.scss'],
 })
-export class GrammarTestComponent implements OnInit {
-  questions: Question[] = [];
+export class GrammarTestComponent {
+  @Input() questions: Question[] | null = null;
 
-  ngOnInit(): void {
-    this.questions = [...MOCK_QUESTION_LIST];
+  @Input() testId: string | null = null;
+
+  @Output() answersGrammar = new EventEmitter<string[] | null>();
+
+  onAnswersSubmit(answers: string[] | null): void {
+    if (answers) this.answersGrammar.emit(answers);
   }
 }

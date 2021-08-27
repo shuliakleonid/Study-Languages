@@ -20,21 +20,24 @@ table {
 .scale {
   display: flex;
   justify-content: space-around;
-  background: linear-gradient(to right, #3366cc 0%, #333399 100%);
+  background: linear-gradient(to right, #5885af 0%, #055c9d 100%);
   border-radius: 0.25rem;
 
   & span {
-    padding: 0.5rem 1rem;
-    color: white;
+    min-width: 4rem;
+    padding: 0.5rem 0;
+    color: var(--white);
+    font-size: 1.25rem;
+    text-align: center;
   }
 }
 
 .desc {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 
   span {
-    color: black;
+    color: var(--black);
     font-size: 0.7rem;
   }
 }
@@ -48,11 +51,11 @@ tr.detail-row {
 }
 
 tr.element-row:not(.expanded-row):hover {
-  background: whitesmoke;
+  background: var(--others-grey6);
 }
 
 tr.element-row:not(.expanded-row):active {
-  background: #efefef;
+  background: var(--secondary-grey3);
 }
 
 .element-row td {
@@ -75,13 +78,8 @@ tr.element-row:not(.expanded-row):active {
   }
 }
 
-.element-symbol {
-  font-weight: bold;
-  font-size: 40px;
-  line-height: normal;
-}
-
 .element-description {
+  display: inline-flex;
   max-width: 50%;
   margin: 0.5rem;
   white-space: normal;
@@ -89,5 +87,50 @@ tr.element-row:not(.expanded-row):active {
 }
 
 .element-description-attribution {
+  width: 100%;
+  cursor: pointer;
+
+  &.ellipsed {
+    width: 15rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+}
+
+.element-description-attribution {
   opacity: 0.5;
+}
+
+.header {
+  padding: 5px;
+}
+
+.header-without-filter {
+  padding: 5px;
+  vertical-align: bottom;
+}
+
+.filter {
+  display: block;
+}
+
+.mat-form-field {
+  margin: 1.5em 0;
+}
+
+.warn {
+  color: var(--error);
+}
+
+.hint {
+  color: var(--secondary-grey);
+}
+
+.result {
+  display: flex;
+  align-self: center;
+  justify-content: start;
+  padding: 1rem;
+  column-gap: 0.25rem;
 }

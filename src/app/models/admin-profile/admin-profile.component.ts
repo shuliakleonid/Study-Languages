@@ -1,8 +1,12 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatTable, MatTableDataSource } from '@angular/material/table';
-import { AdminDialogComponent } from './admin-dialog/admin-dialog.component';
-import { CoachData, MOCK_TEST, TestData } from '../../../mocks/admin-profile-utils.mock';
+import { Component, OnInit } from '@angular/core';
+import { MatTabChangeEvent } from '@angular/material/tabs';
+import { Observable } from 'rxjs';
+import { AdminTableStoreService } from '../../services/store/adminTableStore.service';
+import {
+  AdminTestTabs,
+  ServiceCoachData,
+  TestData,
+} from '../../interfaces/admin-profile-intarfaces';
 
 @Component({
   selector: 'app-admin-profile',
@@ -10,58 +14,47 @@ import { CoachData, MOCK_TEST, TestData } from '../../../mocks/admin-profile-uti
   styleUrls: ['./admin-profile.component.scss'],
 })
 export class AdminProfileComponent implements OnInit {
-  AssignSelector = false;
+  tables$: Observable<TestData[] | null> = this.admin.adminTestResults$;
 
-  assignedTests: TestData[] = [];
+  coaches$: Observable<ServiceCoachData | null> = this.admin.adminCoachResults$;
 
-  notAssignedTests: TestData[] = [];
+  public selectedTab!: AdminTestTabs;
 
-  constructor(public dialog: MatDialog) {
-    this.dataSource = new MatTableDataSource<TestData>(MOCK_TEST);
+  displayedColumns = ['testNumber', 'Level', 'Date', 'Coach', 'Button'];
+
+  tabs: AdminTestTabs[] = [
+    AdminTestTabs.highPriority,
+    AdminTestTabs.notAssigned,
+    AdminTestTabs.assigned,
+  ];
+
+  constructor(private admin: AdminTableStoreService) {
+    this.selectedTab = AdminTestTabs.highPriority;
   }
 
-  displayedColumns: string[] = ['ID', 'Position', 'Level', 'Date', 'Coach', 'Button'];
-
-  displayedColumns1: string[] = ['ID', 'Position', 'Level', 'Date', 'button'];
-
-  @ViewChild(MatTable) table!: MatTable<any>;
-
-  dataSource: MatTableDataSource<TestData>;
-
-  ngOnInit(): void {
-    this.sortByIsAssign(this.dataSource.data);
+  tabChanged(tabChangeEvent: MatTabChangeEvent): void {
+    if (tabChangeEvent.index === 2) {
+      this.admin.getAssignedTestData();
+      this.tables$ = this.admin.adminTestResults$;
+      this.selectedTab = AdminTestTabs.assigned;
+      this.displayedColumns = ['testNumber', 'Level', 'Date', 'Coach', 'Button'];
+    } else if (tabChangeEvent.index === 1) {
+      this.admin.getNotAssignedTestData();
+      this.tables$ = this.admin.adminTestResults$;
+      this.selectedTab = AdminTestTabs.notAssigned;
+      this.displayedColumns = ['testNumber', 'Level', 'Date', 'Button'];
+    } else if (tabChangeEvent.index === 0) {
+      this.admin.getHighPriorityTest();
+      this.tables$ = this.admin.adminTestResults$;
+      this.selectedTab = AdminTestTabs.highPriority;
+      this.displayedColumns = ['testNumber', 'Level', 'Date', 'Coach', 'Button'];
+    }
   }
 
-  openDialog(positionValue: number, coachData: CoachData, Assign: boolean) {
-    const dialogRef = this.dialog.open(AdminDialogComponent, {
-      data: {
-        position: positionValue - 1,
-        coach: coachData,
-        isAssign: Assign,
-      },
-    });
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result.coach === undefined) return;
-      const assignedTest = this.dataSource.data[result.position];
-      assignedTest.coach = result.coach;
-      if (!assignedTest.isAssign) {
-        this.assignedTests.unshift(assignedTest);
-        this.notAssignedTests.splice(this.notAssignedTests.indexOf(assignedTest), 1);
-        assignedTest.isAssign = true;
-        this.table.renderRows();
-      }
-    });
-  }
-
-  sortByIsAssign(data: TestData[]) {
-    data.forEach((element) => {
-      if (element.isAssign) {
-        this.assignedTests.push(element);
-      } else this.notAssignedTests.push(element);
-    });
-  }
-
-  onTabChange(): void {
-    this.AssignSelector = !this.AssignSelector;
+  ngOnInit() {
+    this.admin.getHighPriorityTest();
+    this.tables$ = this.admin.adminTestResults$;
+    this.admin.getCoachData();
+    this.coaches$ = this.admin.adminCoachResults$;
   }
 }
